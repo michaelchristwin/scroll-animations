@@ -1,9 +1,15 @@
-import { For, onCleanup, onMount } from "solid-js";
+import { createSignal, For, onCleanup, onMount } from "solid-js";
 
 export default function HorizontalGallery() {
+  const [height, setHeight] = createSignal(0);
+
   let hScroll!: HTMLElement;
   let hScrollContent!: HTMLDivElement;
 
+  const updateHeight = () => {
+    const containerHeight = hScrollContent.offsetWidth;
+    setHeight(containerHeight);
+  };
   const updateScroll = () => {
     const scrollY = window.scrollY;
     const offsetTop = hScroll.offsetTop;
@@ -25,14 +31,22 @@ export default function HorizontalGallery() {
 
   onMount(() => {
     window.addEventListener("scroll", updateScroll);
+    window.addEventListener("resize", updateHeight);
+    updateHeight();
     updateScroll();
+    console.log("Height: ", height());
   });
   onCleanup(() => {
     window.removeEventListener("scroll", updateScroll);
+    window.removeEventListener("resize", updateHeight);
   });
-
+  console.log("Height: ", height());
   return (
-    <section ref={hScroll} class="relative h-[400vh] bg-neutral-100">
+    <section
+      ref={hScroll}
+      class="relative bg-neutral-100"
+      style={{ height: `${height()}px` }}
+    >
       <div class="sticky top-0 h-screen flex items-center border border-red-500 overflow-x-hidden">
         <div
           ref={hScrollContent}
